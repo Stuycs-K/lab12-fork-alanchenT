@@ -27,7 +27,9 @@ int get_random_int() {
 }
 
 void child_process() {
+    int time_before_death = (unsigned int)get_random_int() % 5 + 1;
 
+    printf("%d %dsec\n", getpid(), time_before_death);
 }
 
 void parent_process() {
@@ -44,6 +46,7 @@ int main() {
         throw_error();
     } else if (child_a == 0) {
         printf("Hi from A\n");
+        child_process();
     } else {
         child_b = fork();
 
@@ -52,6 +55,7 @@ int main() {
             throw_error();
         } else if (child_b == 0) {
             printf("Hi from B\n");
+            child_process();
         } else {
             printf("Hi from parent\n");
         }
