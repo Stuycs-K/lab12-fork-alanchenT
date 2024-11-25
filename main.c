@@ -1,10 +1,10 @@
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
 #include <string.h>
-#include <fcntl.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 void throw_error() {
     printf("[ERROR %d]: %s\n", errno, strerror(errno));
@@ -26,14 +26,19 @@ int get_random_int() {
     return random_value;
 }
 
-void child_process() {
+int child_process() {
     int time_before_death = (unsigned int)get_random_int() % 5 + 1;
 
     printf("%d %dsec\n", getpid(), time_before_death);
+
+    sleep(time_before_death);
+
+    printf("%d finished after %dsec\n", getpid(), time_before_death);
+
+    return 0;
 }
 
 void parent_process() {
-
 }
 
 int main() {
@@ -45,8 +50,7 @@ int main() {
         perror("FORK FAIL (A) !!!\n");
         throw_error();
     } else if (child_a == 0) {
-        printf("Hi from A\n");
-        child_process();
+        return child_process();
     } else {
         child_b = fork();
 
@@ -54,10 +58,9 @@ int main() {
             perror("FORK FAIL (B) !!!\n");
             throw_error();
         } else if (child_b == 0) {
-            printf("Hi from B\n");
-            child_process();
+            return child_process();
         } else {
-            printf("Hi from parent\n");
+            printf("%d about to create 2 child processes\n", getpid());
         }
     }
     return 0;
