@@ -26,7 +26,35 @@ int get_random_int() {
     return random_value;
 }
 
+void child_process() {
+
+}
+
+void parent_process() {
+
+}
+
 int main() {
-    printf("%d\n", get_random_int());
+    pid_t child_a, child_b;
+
+    child_a = fork();
+
+    if (child_a < 0) {
+        perror("FORK FAIL (A) !!!\n");
+        throw_error();
+    } else if (child_a == 0) {
+        printf("Hi from A\n");
+    } else {
+        child_b = fork();
+
+        if (child_b < 0) {
+            perror("FORK FAIL (B) !!!\n");
+            throw_error();
+        } else if (child_b == 0) {
+            printf("Hi from B\n");
+        } else {
+            printf("Hi from parent\n");
+        }
+    }
     return 0;
 }
