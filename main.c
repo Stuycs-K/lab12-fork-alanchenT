@@ -26,7 +26,7 @@ int get_random_int() {
     return random_value;
 }
 
-void child_process() {
+int child_process() {
     int time_before_death = (unsigned int)get_random_int() % 5 + 1;
 
     printf("%d %dsec\n", getpid(), time_before_death);
@@ -35,10 +35,17 @@ void child_process() {
 
     printf("%d finished after %dsec\n", getpid(), time_before_death);
 
-    exit(0);
+    return time_before_death;
 }
 
 void parent_process() {
+    int status = 0;
+    pid_t child_pid = wait(&status);
+
+    printf("Main Process %d is done. Child %d slept for _SEC_ sec\n",
+        getpid(),
+        child_pid
+    );
 }
 
 int main() {
@@ -50,27 +57,25 @@ int main() {
         printf("%d about to create 2 child processes\n", getpid());
     }
 
-    if (child_a < 0) {
-
-        perror("FORK FAIL (A) !!!\n");
-        throw_error();
-
-    } else if (child_a == 0) {
+    if (child_a == 0) {
         child_process();
-    } else {
+    } else if (child_a > 0) {
+
         child_b = fork();
 
-        if (child_b < 0) {
-
-            perror("FORK FAIL (B) !!!\n");
-            throw_error();
-
-        } else if (child_b == 0) {
+        if (child_b == 0) {
             child_process();
+        } else if (child_b > 0) {
+            parent_process();
         } else {
-            int status = 0;
-            wait(&status);
+            perror("Failed to fork\n");
+            throw_error();
         }
+
+    } else {
+        perror("Failed to fork\n");
+        throw_error();
     }
+
     return 0;
 }
