@@ -42,9 +42,10 @@ void parent_process() {
     int status = 0;
     pid_t child_pid = wait(&status);
 
-    printf("Main Process %d is done. Child %d slept for _SEC_ sec\n",
+    printf("Main Process %d is done. Child %d slept for %d sec\n",
         getpid(),
-        child_pid
+        child_pid,
+        WEXITSTATUS(status)
     );
 }
 
@@ -58,13 +59,13 @@ int main() {
     }
 
     if (child_a == 0) {
-        child_process();
+        return child_process();
     } else if (child_a > 0) {
 
         child_b = fork();
 
         if (child_b == 0) {
-            child_process();
+            return child_process();
         } else if (child_b > 0) {
             parent_process();
         } else {
